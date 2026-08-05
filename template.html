@@ -1,0 +1,702 @@
+<meta charset="utf-8" />
+<title>MN Lake Fish Surveys, 2025-2026</title>
+<style>
+  @font-face {
+    font-family: "Survey Mono";
+    src: url(data:font/woff2;base64,__FONT_BASE64__) format("woff2");
+    font-weight: 100 800;
+    font-style: normal;
+    font-display: swap;
+  }
+
+  :root {
+    --bg: #F2F4F1;
+    --surface: #FFFFFF;
+    --surface-alt: #E8ECE6;
+    --ink: #152420;
+    --ink-secondary: #4A5C55;
+    --ink-muted: #7C8B84;
+    --border: #D3DAD2;
+    --accent: #0F6B5C;
+    --accent-hover: #0B5347;
+    --accent-soft: #DCEDE8;
+    --accent-ink: #FFFFFF;
+    --focus-ring: #0F6B5C;
+    --shadow: 0 1px 2px rgba(21, 36, 32, 0.06), 0 4px 12px rgba(21, 36, 32, 0.05);
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #0B1512;
+      --surface: #122019;
+      --surface-alt: #17251E;
+      --ink: #E7EFEA;
+      --ink-secondary: #AABCB3;
+      --ink-muted: #71857C;
+      --border: #25352D;
+      --accent: #3FCBAE;
+      --accent-hover: #5AD9BE;
+      --accent-soft: #173029;
+      --accent-ink: #06120E;
+      --focus-ring: #3FCBAE;
+      --shadow: 0 1px 2px rgba(0, 0, 0, 0.3), 0 4px 16px rgba(0, 0, 0, 0.25);
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #0B1512;
+    --surface: #122019;
+    --surface-alt: #17251E;
+    --ink: #E7EFEA;
+    --ink-secondary: #AABCB3;
+    --ink-muted: #71857C;
+    --border: #25352D;
+    --accent: #3FCBAE;
+    --accent-hover: #5AD9BE;
+    --accent-soft: #173029;
+    --accent-ink: #06120E;
+    --focus-ring: #3FCBAE;
+    --shadow: 0 1px 2px rgba(0, 0, 0, 0.3), 0 4px 16px rgba(0, 0, 0, 0.25);
+  }
+  :root[data-theme="light"] {
+    --bg: #F2F4F1;
+    --surface: #FFFFFF;
+    --surface-alt: #E8ECE6;
+    --ink: #152420;
+    --ink-secondary: #4A5C55;
+    --ink-muted: #7C8B84;
+    --border: #D3DAD2;
+    --accent: #0F6B5C;
+    --accent-hover: #0B5347;
+    --accent-soft: #DCEDE8;
+    --accent-ink: #FFFFFF;
+    --focus-ring: #0F6B5C;
+    --shadow: 0 1px 2px rgba(21, 36, 32, 0.06), 0 4px 12px rgba(21, 36, 32, 0.05);
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--ink);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    line-height: 1.45;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .mono {
+    font-family: "Survey Mono", ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .wrap {
+    max-width: 1160px;
+    margin: 0 auto;
+    padding: 40px 24px 80px;
+  }
+
+  header.masthead {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    margin-bottom: 28px;
+    padding-bottom: 24px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .eyebrow {
+    font-family: "Survey Mono", ui-monospace, monospace;
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.09em;
+    text-transform: uppercase;
+    color: var(--accent);
+  }
+
+  h1 {
+    font-family: "Survey Mono", ui-monospace, monospace;
+    font-size: clamp(26px, 4vw, 34px);
+    font-weight: 700;
+    letter-spacing: -0.01em;
+    margin: 2px 0 4px;
+    text-wrap: balance;
+  }
+
+  .subtitle {
+    color: var(--ink-secondary);
+    font-size: 15px;
+    max-width: 68ch;
+  }
+
+  .provenance {
+    color: var(--ink-muted);
+    font-size: 12.5px;
+    margin-top: 4px;
+  }
+
+  .provenance a { color: var(--ink-muted); }
+
+  /* Stat tiles */
+  .stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 1px;
+    background: var(--border);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    overflow: hidden;
+    margin-bottom: 28px;
+  }
+
+  .stat {
+    background: var(--surface);
+    padding: 16px 18px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .stat .value {
+    font-family: "Survey Mono", ui-monospace, monospace;
+    font-size: 26px;
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .stat .label {
+    font-size: 12px;
+    color: var(--ink-muted);
+    letter-spacing: 0.02em;
+  }
+
+  /* Panel shared style */
+  .panel {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    box-shadow: var(--shadow);
+  }
+
+  /* Leaderboard */
+  .leaderboard {
+    padding: 18px 20px 20px;
+    margin-bottom: 24px;
+  }
+
+  .panel-title {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--ink-secondary);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin: 0 0 12px;
+  }
+
+  .lb-row {
+    display: grid;
+    grid-template-columns: 150px 1fr 46px;
+    align-items: center;
+    gap: 10px;
+    padding: 5px 0;
+    font-size: 13.5px;
+  }
+
+  .lb-name {
+    color: var(--ink);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .lb-track {
+    height: 8px;
+    background: var(--surface-alt);
+    border-radius: 4px;
+    overflow: hidden;
+  }
+
+  .lb-fill {
+    height: 100%;
+    background: var(--accent);
+    border-radius: 4px;
+  }
+
+  .lb-count {
+    font-family: "Survey Mono", ui-monospace, monospace;
+    font-size: 12px;
+    color: var(--ink-muted);
+    text-align: right;
+  }
+
+  /* Filter bar */
+  .filters {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    align-items: center;
+    padding: 14px 16px;
+    margin-bottom: 16px;
+  }
+
+  .filters input[type="search"],
+  .filters select {
+    font: inherit;
+    font-size: 13.5px;
+    color: var(--ink);
+    background: var(--surface-alt);
+    border: 1px solid var(--border);
+    border-radius: 7px;
+    padding: 8px 11px;
+  }
+
+  .filters input[type="search"] { flex: 1 1 200px; min-width: 160px; }
+  .filters select { flex: 0 1 170px; }
+
+  .filters input:focus,
+  .filters select:focus,
+  button:focus-visible,
+  th button:focus-visible {
+    outline: 2px solid var(--focus-ring);
+    outline-offset: 1px;
+  }
+
+  .chip-toggle {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 13px;
+    color: var(--ink-secondary);
+    background: var(--surface-alt);
+    border: 1px solid var(--border);
+    border-radius: 999px;
+    padding: 7px 13px 7px 11px;
+    cursor: pointer;
+    user-select: none;
+    transition: background 0.12s, border-color 0.12s, color 0.12s;
+  }
+
+  .chip-toggle input { accent-color: var(--accent); }
+
+  .chip-toggle.active {
+    background: var(--accent-soft);
+    border-color: var(--accent);
+    color: var(--accent);
+    font-weight: 600;
+  }
+
+  .result-count {
+    font-size: 12.5px;
+    color: var(--ink-muted);
+    margin-left: auto;
+    white-space: nowrap;
+  }
+
+  /* Table */
+  .table-panel { overflow: hidden; }
+  .table-scroll { overflow-x: auto; }
+
+  table {
+    border-collapse: collapse;
+    width: 100%;
+    font-size: 13.5px;
+    min-width: 880px;
+  }
+
+  thead th {
+    position: sticky;
+    top: 0;
+    background: var(--surface-alt);
+    text-align: left;
+    padding: 0;
+    border-bottom: 1px solid var(--border);
+    z-index: 1;
+  }
+
+  thead th button {
+    all: unset;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    width: 100%;
+    padding: 10px 12px;
+    font-size: 11.5px;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: var(--ink-secondary);
+    cursor: pointer;
+    box-sizing: border-box;
+  }
+
+  thead th button:hover { color: var(--ink); }
+
+  thead th .arrow {
+    font-size: 10px;
+    color: var(--accent);
+    opacity: 0;
+  }
+
+  thead th[data-active] .arrow { opacity: 1; }
+
+  tbody tr {
+    border-bottom: 1px solid var(--border);
+  }
+
+  tbody tr:last-child { border-bottom: none; }
+  tbody tr:hover { background: var(--surface-alt); }
+
+  td {
+    padding: 9px 12px;
+    color: var(--ink);
+    white-space: nowrap;
+  }
+
+  td.lake-cell { font-weight: 600; }
+  td.county-cell { color: var(--ink-secondary); }
+  td.num { text-align: right; font-family: "Survey Mono", ui-monospace, monospace; font-variant-numeric: tabular-nums; }
+
+  .game-badge {
+    display: inline-block;
+    font-size: 10.5px;
+    font-weight: 600;
+    letter-spacing: 0.03em;
+    padding: 1px 6px;
+    border-radius: 4px;
+    border: 1px solid var(--border);
+    color: var(--ink-muted);
+    margin-left: 6px;
+    vertical-align: 1px;
+  }
+
+  .empty-state {
+    padding: 48px 20px;
+    text-align: center;
+    color: var(--ink-muted);
+    font-size: 14px;
+  }
+
+  /* Pagination */
+  .pagination {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 14px;
+    padding: 14px 16px;
+    border-top: 1px solid var(--border);
+    font-size: 13px;
+    color: var(--ink-secondary);
+  }
+
+  .pagination button {
+    font: inherit;
+    font-size: 13px;
+    background: var(--surface-alt);
+    border: 1px solid var(--border);
+    color: var(--ink);
+    border-radius: 6px;
+    padding: 6px 12px;
+    cursor: pointer;
+  }
+
+  .pagination button:disabled {
+    opacity: 0.4;
+    cursor: default;
+  }
+
+  .pagination button:not(:disabled):hover { border-color: var(--accent); }
+
+  footer {
+    margin-top: 28px;
+    color: var(--ink-muted);
+    font-size: 12.5px;
+    line-height: 1.6;
+    max-width: 74ch;
+  }
+
+  footer strong { color: var(--ink-secondary); }
+
+  @media (prefers-reduced-motion: reduce) {
+    * { transition: none !important; }
+  }
+</style>
+
+<div class="wrap">
+  <header class="masthead">
+    <span class="eyebrow">Minnesota DNR &middot; Fisheries Lake Surveys</span>
+    <h1>Lake Fish Surveys, 2025&ndash;2026</h1>
+    <p class="subtitle">Every species logged in a Minnesota DNR lake survey dated 2025 or 2026 &mdash; catch counts, CPUE, average weight, and measured size range, pulled directly from DNR's own survey API.</p>
+    <p class="provenance mono" id="provenance"></p>
+  </header>
+
+  <section class="stats" id="stats" aria-label="Summary"></section>
+
+  <section class="panel leaderboard">
+    <p class="panel-title">Most-encountered species (by number of lakes)</p>
+    <div id="leaderboard"></div>
+  </section>
+
+  <section class="panel filters" aria-label="Filters">
+    <input type="search" id="f-search" placeholder="Search lake name&hellip;" aria-label="Search lake name" />
+    <select id="f-county" aria-label="Filter by county"><option value="">All counties</option></select>
+    <select id="f-species" aria-label="Filter by species"><option value="">All species</option></select>
+    <label class="chip-toggle" id="f-gamefish-label">
+      <input type="checkbox" id="f-gamefish" /> Game fish only
+    </label>
+    <label class="chip-toggle" id="f-carp-label">
+      <input type="checkbox" id="f-carp" /> Common carp only
+    </label>
+    <span class="result-count" id="result-count"></span>
+  </section>
+
+  <section class="panel table-panel">
+    <div class="table-scroll">
+      <table id="data-table">
+        <thead>
+          <tr id="table-head"></tr>
+        </thead>
+        <tbody id="table-body"></tbody>
+      </table>
+    </div>
+    <div class="pagination" id="pagination"></div>
+  </section>
+
+  <footer>
+    <p><strong>Coverage:</strong> built from a candidate list of 959 lakes tracked in DNR's biotic-integrity assessment layer, cross-checked against each lake's actual survey history &mdash; not a complete census of every 2025&ndash;2026 MN fish survey. That layer systematically excludes DNR's Large Lake Program waters (confirmed via Mille Lacs, which has a real 2025 survey but wasn't in the candidate list at all), so 8 of Minnesota's biggest lakes &mdash; Kabetogama, Lake of the Woods, Leech, Mille Lacs, Rainy, Upper Red, Vermilion, and Winnibigoshish &mdash; were added by hand after being individually verified against DNR's API. Lake Pepin (the Mississippi River pool one) is still missing; its DOW number couldn't be reliably located and it may not follow the standard lake-survey pattern at all. DNR runs roughly 650 surveys/year statewide; this dataset found 524 across 387 lakes. Of those, 77 surveys (mostly "Targeted Survey" type &mdash; likely invasive-species or single-species checks) logged no fish catch at all, which is why the table below reflects catch data for fewer lakes than 387. Species with zero catch in a given lake/year simply don't appear as rows.</p>
+    <p><strong>Source:</strong> Minnesota DNR LakeFinder survey API (<span class="mono">maps.dnr.state.mn.us</span>) and DNR Fisheries species reference data. Not an official DNR product.</p>
+  </footer>
+</div>
+
+<script id="app-data" type="application/json">__DATA_JSON__</script>
+<script>
+(function () {
+  "use strict";
+
+  var raw = JSON.parse(document.getElementById("app-data").textContent);
+  var meta = raw.meta;
+  var rows = raw.rows;
+
+  // ---------- Provenance / stats ----------
+  document.getElementById("provenance").textContent =
+    "Generated " + meta.generated.slice(0, 10) + " · " + meta.qualifyingLakes + " lakes · " + meta.totalSurveys + " surveys";
+
+  var distinctLakes = new Set(rows.map(function (r) { return r.dow; }));
+  var distinctSpecies = new Set(rows.map(function (r) { return r.code; }));
+  var carpLakes = new Set(rows.filter(function (r) { return r.code === "CAP"; }).map(function (r) { return r.dow; }));
+
+  var stats = [
+    { value: distinctLakes.size, label: "Lakes with catch data" },
+    { value: meta.totalSurveys, label: "Surveys logged" },
+    { value: distinctSpecies.size, label: "Species recorded" },
+    { value: carpLakes.size, label: "Lakes with common carp" }
+  ];
+  var statsEl = document.getElementById("stats");
+  stats.forEach(function (s) {
+    var d = document.createElement("div");
+    d.className = "stat";
+    d.innerHTML = '<span class="value mono">' + s.value.toLocaleString() + '</span><span class="label">' + s.label + "</span>";
+    statsEl.appendChild(d);
+  });
+
+  // ---------- Leaderboard: top species by distinct-lake count ----------
+  var lakesBySpecies = {};
+  rows.forEach(function (r) {
+    if (!lakesBySpecies[r.code]) lakesBySpecies[r.code] = { name: r.name, lakes: new Set() };
+    lakesBySpecies[r.code].lakes.add(r.dow);
+  });
+  var leaderboard = Object.keys(lakesBySpecies)
+    .map(function (code) { return { code: code, name: lakesBySpecies[code].name, count: lakesBySpecies[code].lakes.size }; })
+    .sort(function (a, b) { return b.count - a.count; })
+    .slice(0, 8);
+  var maxCount = leaderboard.length ? leaderboard[0].count : 1;
+  var lbEl = document.getElementById("leaderboard");
+  leaderboard.forEach(function (s) {
+    var row = document.createElement("div");
+    row.className = "lb-row";
+    var pct = Math.max(4, Math.round((s.count / maxCount) * 100));
+    row.innerHTML =
+      '<span class="lb-name">' + s.name + '</span>' +
+      '<span class="lb-track"><span class="lb-fill" style="width:' + pct + '%"></span></span>' +
+      '<span class="lb-count mono">' + s.count + "</span>";
+    lbEl.appendChild(row);
+  });
+
+  // ---------- Filter option lists ----------
+  var counties = Array.from(new Set(rows.map(function (r) { return r.county; }).filter(Boolean))).sort();
+  var speciesList = Array.from(
+    new Map(rows.map(function (r) { return [r.code, r.name]; })).entries()
+  ).sort(function (a, b) { return a[1].localeCompare(b[1]); });
+
+  var countySel = document.getElementById("f-county");
+  counties.forEach(function (c) {
+    var o = document.createElement("option");
+    o.value = c; o.textContent = c;
+    countySel.appendChild(o);
+  });
+
+  var speciesSel = document.getElementById("f-species");
+  speciesList.forEach(function (pair) {
+    var o = document.createElement("option");
+    o.value = pair[0]; o.textContent = pair[1];
+    speciesSel.appendChild(o);
+  });
+
+  // ---------- Table setup ----------
+  var columns = [
+    { key: "lake", label: "Lake", type: "string" },
+    { key: "county", label: "County", type: "string" },
+    { key: "date", label: "Survey Date", type: "string" },
+    { key: "name", label: "Species", type: "string" },
+    { key: "catch", label: "Catch", type: "number" },
+    { key: "cpue", label: "CPUE", type: "number" },
+    { key: "avgWeight", label: "Avg Wt (lb)", type: "number" },
+    { key: "size", label: "Size Range (in)", type: "number", sortKey: "minLen" }
+  ];
+
+  var theadRow = document.getElementById("table-head");
+  columns.forEach(function (col) {
+    var th = document.createElement("th");
+    var btn = document.createElement("button");
+    btn.type = "button";
+    btn.innerHTML = col.label + '<span class="arrow">▾</span>';
+    btn.addEventListener("click", function () { setSort(col.sortKey || col.key); });
+    th.appendChild(btn);
+    th.dataset.key = col.sortKey || col.key;
+    theadRow.appendChild(th);
+  });
+
+  var state = { search: "", county: "", species: "", gameFishOnly: false, carpOnly: false, sortKey: "catch", sortDir: "desc", page: 1 };
+  var pageSize = 50;
+
+  function applyFilters() {
+    var s = state.search.trim().toLowerCase();
+    return rows.filter(function (r) {
+      if (s && r.lake.toLowerCase().indexOf(s) === -1) return false;
+      if (state.county && r.county !== state.county) return false;
+      if (state.species && r.code !== state.species) return false;
+      if (state.gameFishOnly && !r.gameFish) return false;
+      if (state.carpOnly && r.code !== "CAP") return false;
+      return true;
+    });
+  }
+
+  function sortRows(filtered) {
+    var key = state.sortKey, dir = state.sortDir === "asc" ? 1 : -1;
+    return filtered.slice().sort(function (a, b) {
+      var av = a[key], bv = b[key];
+      if (av === null || av === undefined) return 1;
+      if (bv === null || bv === undefined) return -1;
+      if (typeof av === "string") return av.localeCompare(bv) * dir;
+      return (av - bv) * dir;
+    });
+  }
+
+  function fmtSize(r) {
+    if (r.minLen == null && r.maxLen == null) return "—";
+    if (r.minLen === r.maxLen) return r.minLen + '"';
+    return (r.minLen == null ? "?" : r.minLen) + "–" + (r.maxLen == null ? "?" : r.maxLen) + '"';
+  }
+
+  function fmtNum(v, digits) {
+    if (v === null || v === undefined) return "—";
+    return digits ? v.toFixed(digits) : String(v);
+  }
+
+  function render() {
+    var filtered = applyFilters();
+    var sorted = sortRows(filtered);
+    var totalPages = Math.max(1, Math.ceil(sorted.length / pageSize));
+    if (state.page > totalPages) state.page = totalPages;
+    var start = (state.page - 1) * pageSize;
+    var pageRows = sorted.slice(start, start + pageSize);
+
+    document.getElementById("result-count").textContent = filtered.length.toLocaleString() + " rows";
+
+    Array.prototype.forEach.call(theadRow.children, function (th) {
+      if (th.dataset.key === state.sortKey) {
+        th.setAttribute("data-active", "");
+        th.querySelector(".arrow").textContent = state.sortDir === "asc" ? "▴" : "▾";
+      } else {
+        th.removeAttribute("data-active");
+        th.querySelector(".arrow").textContent = "▾";
+      }
+    });
+
+    var tbody = document.getElementById("table-body");
+    tbody.innerHTML = "";
+    if (!pageRows.length) {
+      var tr = document.createElement("tr");
+      var td = document.createElement("td");
+      td.colSpan = columns.length;
+      td.className = "empty-state";
+      td.textContent = "No rows match those filters.";
+      tr.appendChild(td);
+      tbody.appendChild(tr);
+    } else {
+      pageRows.forEach(function (r) {
+        var tr = document.createElement("tr");
+        tr.innerHTML =
+          '<td class="lake-cell">' + r.lake + "</td>" +
+          '<td class="county-cell">' + (r.county || "—") + "</td>" +
+          '<td class="mono">' + r.date + "</td>" +
+          '<td>' + r.name + (r.gameFish ? '<span class="game-badge">GAME</span>' : "") + "</td>" +
+          '<td class="num">' + fmtNum(r.catch) + "</td>" +
+          '<td class="num">' + fmtNum(r.cpue, 2) + "</td>" +
+          '<td class="num">' + fmtNum(r.avgWeight, 2) + "</td>" +
+          '<td class="num">' + fmtSize(r) + "</td>";
+        tbody.appendChild(tr);
+      });
+    }
+
+    var pag = document.getElementById("pagination");
+    pag.innerHTML = "";
+    var prev = document.createElement("button");
+    prev.textContent = "← Prev";
+    prev.disabled = state.page <= 1;
+    prev.addEventListener("click", function () { state.page--; render(); });
+    var next = document.createElement("button");
+    next.textContent = "Next →";
+    next.disabled = state.page >= totalPages;
+    next.addEventListener("click", function () { state.page++; render(); });
+    var label = document.createElement("span");
+    label.className = "mono";
+    label.textContent = "Page " + state.page + " of " + totalPages;
+    pag.appendChild(prev);
+    pag.appendChild(label);
+    pag.appendChild(next);
+  }
+
+  function setSort(key) {
+    if (state.sortKey === key) {
+      state.sortDir = state.sortDir === "asc" ? "desc" : "asc";
+    } else {
+      state.sortKey = key;
+      state.sortDir = "desc";
+    }
+    state.page = 1;
+    render();
+  }
+
+  document.getElementById("f-search").addEventListener("input", function (e) {
+    state.search = e.target.value; state.page = 1; render();
+  });
+  document.getElementById("f-county").addEventListener("change", function (e) {
+    state.county = e.target.value; state.page = 1; render();
+  });
+  document.getElementById("f-species").addEventListener("change", function (e) {
+    state.species = e.target.value; state.page = 1; render();
+  });
+  document.getElementById("f-gamefish").addEventListener("change", function (e) {
+    state.gameFishOnly = e.target.checked;
+    document.getElementById("f-gamefish-label").classList.toggle("active", state.gameFishOnly);
+    state.page = 1; render();
+  });
+  document.getElementById("f-carp").addEventListener("change", function (e) {
+    state.carpOnly = e.target.checked;
+    document.getElementById("f-carp-label").classList.toggle("active", state.carpOnly);
+    if (state.carpOnly) { speciesSel.value = ""; state.species = ""; }
+    state.page = 1; render();
+  });
+
+  render();
+})();
+</script>
