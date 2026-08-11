@@ -54,7 +54,11 @@ for lake in raw["lakes"]:
 
             total_catch = sum(fc.get("totalCatch") or 0 for fc in entries)
             total_weight_g = sum(to_float(fc.get("totalWeight")) or 0 for fc in entries)
-            avg_weight_lb = (total_weight_g / GRAMS_PER_LB / total_catch) if total_catch else None
+            # DNR reports totalWeight as exactly 0 when fish weren't individually
+            # weighed at all (common on targeted young-of-year counts using seines/
+            # electrofishing) - not when they genuinely weigh nothing. Treat that
+            # as "not measured" rather than a real 0.00 lb average.
+            avg_weight_lb = (total_weight_g / GRAMS_PER_LB / total_catch) if total_catch and total_weight_g > 0 else None
 
             rows.append(
                 {
