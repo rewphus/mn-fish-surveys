@@ -474,7 +474,7 @@
   <header class="masthead">
     <span class="eyebrow">Minnesota DNR &middot; Fisheries Lake Surveys</span>
     <h1>Lake Fish Surveys, 2025&ndash;2026</h1>
-    <p class="subtitle">Every species logged in a Minnesota DNR lake survey dated 2025 or 2026 &mdash; catch counts, CPUE, average weight, and measured size range, pulled directly from DNR's own survey API.</p>
+    <p class="subtitle">Every species logged in a Minnesota DNR lake survey dated 2025 or 2026 &mdash; catch counts, average weight, and measured size range, pulled directly from DNR's own survey API and combined across gear types per lake.</p>
     <p class="provenance mono" id="provenance"></p>
   </header>
 
@@ -639,7 +639,6 @@
     { key: "date", label: "Survey Date", type: "string" },
     { key: "name", label: "Species", type: "string" },
     { key: "catch", label: "Catch", type: "number" },
-    { key: "cpue", label: "CPUE", type: "number" },
     { key: "avgWeight", label: "Avg Wt (lb)", type: "number" },
     { key: "size", label: "Size Range (in)", type: "number", sortKey: "minLen" },
     { key: "distance", label: "Distance (mi)", type: "number" }
@@ -744,7 +743,6 @@
           '<td class="mono">' + r.date + "</td>" +
           '<td>' + r.name + (r.gameFish ? '<span class="game-badge">GAME</span>' : "") + "</td>" +
           '<td class="num">' + fmtNum(r.catch) + "</td>" +
-          '<td class="num">' + fmtNum(r.cpue, 2) + "</td>" +
           '<td class="num">' + fmtNum(r.avgWeight, 2) + "</td>" +
           '<td class="num">' + fmtSize(r) + "</td>" +
           '<td class="num">' + (dist === null ? "—" : fmtNum(dist, 1)) + "</td>";
