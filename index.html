@@ -259,6 +259,31 @@
   .filters select { flex: 0 1 130px; min-width: 100px; }
   .filters input[type="text"].city-input { flex: 0 1 140px; min-width: 110px; }
 
+  .chip-toggle {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 13px;
+    color: var(--ink-secondary);
+    background: var(--surface-alt);
+    border: 1px solid var(--border);
+    border-radius: 7px;
+    padding: 7px 10px;
+    cursor: pointer;
+    user-select: none;
+    white-space: nowrap;
+    transition: background 0.12s, border-color 0.12s, color 0.12s;
+  }
+
+  .chip-toggle input { accent-color: var(--accent); margin: 0; }
+
+  .chip-toggle.active {
+    background: var(--accent-soft);
+    border-color: var(--accent);
+    color: var(--accent);
+    font-weight: 600;
+  }
+
   .filters input:focus,
   .filters select:focus,
   button:focus-visible,
@@ -490,6 +515,9 @@
       <input type="search" id="f-search" placeholder="Search lake name&hellip;" aria-label="Search lake name" />
       <select id="f-county" aria-label="Filter by county"><option value="">All counties</option></select>
       <select id="f-species" aria-label="Filter by species"><option value="">All species</option></select>
+      <label class="chip-toggle" id="f-gamefish-label">
+        <input type="checkbox" id="f-gamefish" /> Game fish only
+      </label>
       <button type="button" class="btn-locate" id="f-locate">📍 My location</button>
       <span class="divider-word">or</span>
       <input type="text" id="f-city" class="city-input" placeholder="City, MN&hellip;" aria-label="City or town to center on" />
@@ -657,7 +685,7 @@
   });
 
   var state = {
-    search: "", county: "", species: "",
+    search: "", county: "", species: "", gameFishOnly: false,
     sortKey: "catch", sortDir: "desc", page: 1,
     refPoint: null, refLabel: "", radiusMiles: 25
   };
@@ -669,6 +697,7 @@
       if (s && r.lake.toLowerCase().indexOf(s) === -1) return false;
       if (state.county && r.county !== state.county) return false;
       if (state.species && r.code !== state.species) return false;
+      if (state.gameFishOnly && !r.gameFish) return false;
       if (state.refPoint) {
         var d = getDistance(r);
         if (d === null || d > state.radiusMiles) return false;
@@ -787,6 +816,11 @@
   });
   document.getElementById("f-species").addEventListener("change", function (e) {
     state.species = e.target.value; state.page = 1; render();
+  });
+  document.getElementById("f-gamefish").addEventListener("change", function (e) {
+    state.gameFishOnly = e.target.checked;
+    document.getElementById("f-gamefish-label").classList.toggle("active", state.gameFishOnly);
+    state.page = 1; render();
   });
 
   // ---------- Distance controls ----------
