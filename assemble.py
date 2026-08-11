@@ -5,7 +5,7 @@ the final, self-contained artifact.html."""
 with open("template.html") as f:
     template = f.read()
 
-with open("/tmp/jbm.b64") as f:
+with open("font.b64") as f:
     font_b64 = f.read().strip()
 
 with open("app_data.json") as f:

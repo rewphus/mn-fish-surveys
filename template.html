@@ -231,11 +231,16 @@
   /* Filter bar */
   .filters {
     display: flex;
+    flex-direction: column;
+    margin-bottom: 16px;
+  }
+
+  .filters-row {
+    display: flex;
     flex-wrap: wrap;
     gap: 10px;
     align-items: center;
     padding: 14px 16px;
-    margin-bottom: 16px;
   }
 
   .filters input[type="search"],
@@ -289,6 +294,79 @@
     color: var(--ink-muted);
     margin-left: auto;
     white-space: nowrap;
+  }
+
+  /* Distance row */
+  .distance-row {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 10px;
+    padding: 12px 16px 14px;
+    border-top: 1px solid var(--border);
+  }
+
+  .distance-row .divider-word {
+    font-size: 12px;
+    color: var(--ink-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+  }
+
+  .btn-locate {
+    font: inherit;
+    font-size: 13px;
+    font-weight: 600;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: var(--accent-soft);
+    color: var(--accent);
+    border: 1px solid var(--accent);
+    border-radius: 7px;
+    padding: 7px 12px;
+    cursor: pointer;
+  }
+
+  .btn-locate:hover { background: var(--accent); color: var(--accent-ink); }
+  .btn-locate:disabled { opacity: 0.5; cursor: default; background: var(--accent-soft); color: var(--accent); }
+
+  .radius-field {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 13px;
+    color: var(--ink-secondary);
+  }
+
+  .radius-field input {
+    font: inherit;
+    font-family: "Survey Mono", ui-monospace, monospace;
+    width: 60px;
+    background: var(--surface-alt);
+    border: 1px solid var(--border);
+    border-radius: 7px;
+    padding: 7px 8px;
+    color: var(--ink);
+  }
+
+  .distance-status {
+    font-size: 12.5px;
+    color: var(--ink-muted);
+  }
+
+  .distance-status.active { color: var(--accent); font-weight: 600; }
+  .distance-status.error { color: #C4573B; }
+
+  .btn-clear-distance {
+    font: inherit;
+    font-size: 12.5px;
+    background: none;
+    border: none;
+    color: var(--ink-muted);
+    text-decoration: underline;
+    cursor: pointer;
+    padding: 0;
   }
 
   /* Table */
@@ -436,16 +514,28 @@
   </section>
 
   <section class="panel filters" aria-label="Filters">
-    <input type="search" id="f-search" placeholder="Search lake name&hellip;" aria-label="Search lake name" />
-    <select id="f-county" aria-label="Filter by county"><option value="">All counties</option></select>
-    <select id="f-species" aria-label="Filter by species"><option value="">All species</option></select>
-    <label class="chip-toggle" id="f-gamefish-label">
-      <input type="checkbox" id="f-gamefish" /> Game fish only
-    </label>
-    <label class="chip-toggle" id="f-carp-label">
-      <input type="checkbox" id="f-carp" /> Common carp only
-    </label>
-    <span class="result-count" id="result-count"></span>
+    <div class="filters-row">
+      <input type="search" id="f-search" placeholder="Search lake name&hellip;" aria-label="Search lake name" />
+      <select id="f-county" aria-label="Filter by county"><option value="">All counties</option></select>
+      <select id="f-species" aria-label="Filter by species"><option value="">All species</option></select>
+      <label class="chip-toggle" id="f-gamefish-label">
+        <input type="checkbox" id="f-gamefish" /> Game fish only
+      </label>
+      <label class="chip-toggle" id="f-carp-label">
+        <input type="checkbox" id="f-carp" /> Common carp only
+      </label>
+      <span class="result-count" id="result-count"></span>
+    </div>
+    <div class="distance-row">
+      <button type="button" class="btn-locate" id="f-locate">📍 Use my location</button>
+      <span class="divider-word">or</span>
+      <select id="f-near-lake" aria-label="Center distance on a lake"><option value="">Center on a lake&hellip;</option></select>
+      <span class="radius-field">
+        within <input type="number" id="f-radius" value="25" min="1" max="500" aria-label="Radius in miles" /> mi
+      </span>
+      <span class="distance-status" id="distance-status"></span>
+      <button type="button" class="btn-clear-distance" id="f-clear-distance" hidden>Clear</button>
+    </div>
   </section>
 
   <section class="panel table-panel">
@@ -540,6 +630,39 @@
     speciesSel.appendChild(o);
   });
 
+  // ---------- Distance: lake coordinates + "center on a lake" list ----------
+  var lakeCoords = {}; // dow -> {lat, lon, name}
+  rows.forEach(function (r) {
+    if (!lakeCoords[r.dow] && r.lat != null && r.lon != null) {
+      lakeCoords[r.dow] = { lat: r.lat, lon: r.lon, name: r.lake };
+    }
+  });
+  var nearLakeSel = document.getElementById("f-near-lake");
+  Object.keys(lakeCoords)
+    .map(function (dow) { return { dow: dow, name: lakeCoords[dow].name }; })
+    .sort(function (a, b) { return a.name.localeCompare(b.name); })
+    .forEach(function (l) {
+      var o = document.createElement("option");
+      o.value = l.dow; o.textContent = l.name;
+      nearLakeSel.appendChild(o);
+    });
+
+  var EARTH_RADIUS_MI = 3958.8;
+  function haversineMiles(lat1, lon1, lat2, lon2) {
+    var toRad = function (d) { return (d * Math.PI) / 180; };
+    var dLat = toRad(lat2 - lat1);
+    var dLon = toRad(lon2 - lon1);
+    var a =
+      Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+      Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) * Math.sin(dLon / 2) * Math.sin(dLon / 2);
+    return EARTH_RADIUS_MI * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+  }
+
+  function getDistance(r) {
+    if (!state.refPoint || r.lat == null || r.lon == null) return null;
+    return haversineMiles(state.refPoint.lat, state.refPoint.lon, r.lat, r.lon);
+  }
+
   // ---------- Table setup ----------
   var columns = [
     { key: "lake", label: "Lake", type: "string" },
@@ -549,7 +672,8 @@
     { key: "catch", label: "Catch", type: "number" },
     { key: "cpue", label: "CPUE", type: "number" },
     { key: "avgWeight", label: "Avg Wt (lb)", type: "number" },
-    { key: "size", label: "Size Range (in)", type: "number", sortKey: "minLen" }
+    { key: "size", label: "Size Range (in)", type: "number", sortKey: "minLen" },
+    { key: "distance", label: "Distance (mi)", type: "number" }
   ];
 
   var theadRow = document.getElementById("table-head");
@@ -564,7 +688,11 @@
     theadRow.appendChild(th);
   });
 
-  var state = { search: "", county: "", species: "", gameFishOnly: false, carpOnly: false, sortKey: "catch", sortDir: "desc", page: 1 };
+  var state = {
+    search: "", county: "", species: "", gameFishOnly: false, carpOnly: false,
+    sortKey: "catch", sortDir: "desc", page: 1,
+    refPoint: null, refLabel: "", radiusMiles: 25
+  };
   var pageSize = 50;
 
   function applyFilters() {
@@ -575,14 +703,22 @@
       if (state.species && r.code !== state.species) return false;
       if (state.gameFishOnly && !r.gameFish) return false;
       if (state.carpOnly && r.code !== "CAP") return false;
+      if (state.refPoint) {
+        var d = getDistance(r);
+        if (d === null || d > state.radiusMiles) return false;
+      }
       return true;
     });
+  }
+
+  function getValue(r, key) {
+    return key === "distance" ? getDistance(r) : r[key];
   }
 
   function sortRows(filtered) {
     var key = state.sortKey, dir = state.sortDir === "asc" ? 1 : -1;
     return filtered.slice().sort(function (a, b) {
-      var av = a[key], bv = b[key];
+      var av = getValue(a, key), bv = getValue(b, key);
       if (av === null || av === undefined) return 1;
       if (bv === null || bv === undefined) return -1;
       if (typeof av === "string") return av.localeCompare(bv) * dir;
@@ -634,6 +770,7 @@
     } else {
       pageRows.forEach(function (r) {
         var tr = document.createElement("tr");
+        var dist = getDistance(r);
         tr.innerHTML =
           '<td class="lake-cell">' + r.lake + "</td>" +
           '<td class="county-cell">' + (r.county || "—") + "</td>" +
@@ -642,7 +779,8 @@
           '<td class="num">' + fmtNum(r.catch) + "</td>" +
           '<td class="num">' + fmtNum(r.cpue, 2) + "</td>" +
           '<td class="num">' + fmtNum(r.avgWeight, 2) + "</td>" +
-          '<td class="num">' + fmtSize(r) + "</td>";
+          '<td class="num">' + fmtSize(r) + "</td>" +
+          '<td class="num">' + (dist === null ? "—" : fmtNum(dist, 1)) + "</td>";
         tbody.appendChild(tr);
       });
     }
@@ -694,6 +832,66 @@
     state.carpOnly = e.target.checked;
     document.getElementById("f-carp-label").classList.toggle("active", state.carpOnly);
     if (state.carpOnly) { speciesSel.value = ""; state.species = ""; }
+    state.page = 1; render();
+  });
+
+  // ---------- Distance controls ----------
+  var statusEl = document.getElementById("distance-status");
+  var clearBtn = document.getElementById("f-clear-distance");
+  var locateBtn = document.getElementById("f-locate");
+  var radiusInput = document.getElementById("f-radius");
+
+  function setDistanceStatus(text, kind) {
+    statusEl.textContent = text;
+    statusEl.className = "distance-status" + (kind ? " " + kind : "");
+    clearBtn.hidden = !state.refPoint;
+  }
+
+  document.getElementById("f-locate").addEventListener("click", function () {
+    if (!navigator.geolocation) {
+      setDistanceStatus("Geolocation isn't available in this browser.", "error");
+      return;
+    }
+    locateBtn.disabled = true;
+    setDistanceStatus("Locating…");
+    navigator.geolocation.getCurrentPosition(
+      function (pos) {
+        state.refPoint = { lat: pos.coords.latitude, lon: pos.coords.longitude };
+        state.refLabel = "your location";
+        nearLakeSel.value = "";
+        locateBtn.disabled = false;
+        setDistanceStatus("Centered on your location", "active");
+        state.page = 1; render();
+      },
+      function (err) {
+        locateBtn.disabled = false;
+        setDistanceStatus("Couldn't get your location (" + err.message + ")", "error");
+      },
+      { timeout: 10000 }
+    );
+  });
+
+  nearLakeSel.addEventListener("change", function (e) {
+    var dow = e.target.value;
+    if (!dow) return;
+    var lake = lakeCoords[dow];
+    state.refPoint = { lat: lake.lat, lon: lake.lon };
+    state.refLabel = lake.name;
+    setDistanceStatus("Centered on " + lake.name, "active");
+    state.page = 1; render();
+  });
+
+  radiusInput.addEventListener("input", function (e) {
+    var v = parseFloat(e.target.value);
+    state.radiusMiles = isNaN(v) ? 25 : v;
+    state.page = 1; render();
+  });
+
+  clearBtn.addEventListener("click", function () {
+    state.refPoint = null;
+    state.refLabel = "";
+    nearLakeSel.value = "";
+    setDistanceStatus("");
     state.page = 1; render();
   });
 

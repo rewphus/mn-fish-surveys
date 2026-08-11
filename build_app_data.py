@@ -18,6 +18,10 @@ def to_float(value):
 
 rows = []
 for lake in raw["lakes"]:
+    point = lake.get("point") or {}
+    latlon = point.get("epsg:4326")  # DNR returns [lon, lat]
+    lat = latlon[1] if latlon else None
+    lon = latlon[0] if latlon else None
     for survey in lake["surveys"]:
         for fc in survey.get("fishCatchSummaries", []):
             code = fc.get("species")
@@ -28,6 +32,8 @@ for lake in raw["lakes"]:
                     "lake": lake["lake_name"],
                     "county": lake.get("county"),
                     "dow": lake["dow"],
+                    "lat": lat,
+                    "lon": lon,
                     "date": survey.get("surveyDate"),
                     "surveyType": survey.get("surveySubType") or survey.get("surveyType"),
                     "code": code,
