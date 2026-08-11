@@ -238,24 +238,26 @@
   .filters-row {
     display: flex;
     flex-wrap: wrap;
-    gap: 10px;
+    gap: 8px;
     align-items: center;
-    padding: 14px 16px;
+    padding: 12px 16px;
   }
 
   .filters input[type="search"],
+  .filters input[type="text"],
   .filters select {
     font: inherit;
-    font-size: 13.5px;
+    font-size: 13px;
     color: var(--ink);
     background: var(--surface-alt);
     border: 1px solid var(--border);
     border-radius: 7px;
-    padding: 8px 11px;
+    padding: 7px 10px;
   }
 
-  .filters input[type="search"] { flex: 1 1 200px; min-width: 160px; }
-  .filters select { flex: 0 1 170px; }
+  .filters input[type="search"] { flex: 1 1 150px; min-width: 120px; }
+  .filters select { flex: 0 1 130px; min-width: 100px; }
+  .filters input[type="text"].city-input { flex: 0 1 140px; min-width: 110px; }
 
   .filters input:focus,
   .filters select:focus,
@@ -265,49 +267,8 @@
     outline-offset: 1px;
   }
 
-  .chip-toggle {
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    font-size: 13px;
-    color: var(--ink-secondary);
-    background: var(--surface-alt);
-    border: 1px solid var(--border);
-    border-radius: 999px;
-    padding: 7px 13px 7px 11px;
-    cursor: pointer;
-    user-select: none;
-    transition: background 0.12s, border-color 0.12s, color 0.12s;
-  }
-
-  .chip-toggle input { accent-color: var(--accent); }
-
-  .chip-toggle.active {
-    background: var(--accent-soft);
-    border-color: var(--accent);
-    color: var(--accent);
-    font-weight: 600;
-  }
-
-  .result-count {
-    font-size: 12.5px;
-    color: var(--ink-muted);
-    margin-left: auto;
-    white-space: nowrap;
-  }
-
-  /* Distance row */
-  .distance-row {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    gap: 10px;
-    padding: 12px 16px 14px;
-    border-top: 1px solid var(--border);
-  }
-
-  .distance-row .divider-word {
-    font-size: 12px;
+  .divider-word {
+    font-size: 11.5px;
     color: var(--ink-muted);
     text-transform: uppercase;
     letter-spacing: 0.04em;
@@ -319,12 +280,13 @@
     font-weight: 600;
     display: inline-flex;
     align-items: center;
-    gap: 6px;
+    gap: 5px;
+    white-space: nowrap;
     background: var(--accent-soft);
     color: var(--accent);
     border: 1px solid var(--accent);
     border-radius: 7px;
-    padding: 7px 12px;
+    padding: 7px 10px;
     cursor: pointer;
   }
 
@@ -334,29 +296,22 @@
   .radius-field {
     display: inline-flex;
     align-items: center;
-    gap: 6px;
+    gap: 5px;
     font-size: 13px;
     color: var(--ink-secondary);
+    white-space: nowrap;
   }
 
   .radius-field input {
     font: inherit;
     font-family: "Survey Mono", ui-monospace, monospace;
-    width: 60px;
+    width: 48px;
     background: var(--surface-alt);
     border: 1px solid var(--border);
     border-radius: 7px;
-    padding: 7px 8px;
+    padding: 7px 6px;
     color: var(--ink);
   }
-
-  .distance-status {
-    font-size: 12.5px;
-    color: var(--ink-muted);
-  }
-
-  .distance-status.active { color: var(--accent); font-weight: 600; }
-  .distance-status.error { color: #C4573B; }
 
   .btn-clear-distance {
     font: inherit;
@@ -367,7 +322,24 @@
     text-decoration: underline;
     cursor: pointer;
     padding: 0;
+    white-space: nowrap;
   }
+
+  .result-count {
+    font-size: 12.5px;
+    color: var(--ink-muted);
+    margin-left: auto;
+    white-space: nowrap;
+  }
+
+  .distance-status-row {
+    padding: 0 16px 12px;
+    font-size: 12.5px;
+  }
+
+  .distance-status { color: var(--ink-muted); }
+  .distance-status.active { color: var(--accent); font-weight: 600; }
+  .distance-status.error { color: #C4573B; }
 
   /* Table */
   .table-panel { overflow: hidden; }
@@ -518,23 +490,17 @@
       <input type="search" id="f-search" placeholder="Search lake name&hellip;" aria-label="Search lake name" />
       <select id="f-county" aria-label="Filter by county"><option value="">All counties</option></select>
       <select id="f-species" aria-label="Filter by species"><option value="">All species</option></select>
-      <label class="chip-toggle" id="f-gamefish-label">
-        <input type="checkbox" id="f-gamefish" /> Game fish only
-      </label>
-      <label class="chip-toggle" id="f-carp-label">
-        <input type="checkbox" id="f-carp" /> Common carp only
-      </label>
-      <span class="result-count" id="result-count"></span>
-    </div>
-    <div class="distance-row">
-      <button type="button" class="btn-locate" id="f-locate">📍 Use my location</button>
+      <button type="button" class="btn-locate" id="f-locate">📍 My location</button>
       <span class="divider-word">or</span>
-      <select id="f-near-lake" aria-label="Center distance on a lake"><option value="">Center on a lake&hellip;</option></select>
+      <input type="text" id="f-city" class="city-input" placeholder="City, MN&hellip;" aria-label="City or town to center on" />
       <span class="radius-field">
         within <input type="number" id="f-radius" value="25" min="1" max="500" aria-label="Radius in miles" /> mi
       </span>
-      <span class="distance-status" id="distance-status"></span>
       <button type="button" class="btn-clear-distance" id="f-clear-distance" hidden>Clear</button>
+      <span class="result-count" id="result-count"></span>
+    </div>
+    <div class="distance-status-row" id="distance-status-row" hidden>
+      <span class="distance-status" id="distance-status"></span>
     </div>
   </section>
 
@@ -557,6 +523,7 @@
 </div>
 
 <script id="app-data" type="application/json">__DATA_JSON__</script>
+<script id="mn-places" type="application/json">__PLACES_JSON__</script>
 <script>
 (function () {
   "use strict";
@@ -630,22 +597,24 @@
     speciesSel.appendChild(o);
   });
 
-  // ---------- Distance: lake coordinates + "center on a lake" list ----------
-  var lakeCoords = {}; // dow -> {lat, lon, name}
-  rows.forEach(function (r) {
-    if (!lakeCoords[r.dow] && r.lat != null && r.lon != null) {
-      lakeCoords[r.dow] = { lat: r.lat, lon: r.lon, name: r.lake };
+  // ---------- Distance: MN city/town lookup (no external geocoding service) ----------
+  var mnPlaces = JSON.parse(document.getElementById("mn-places").textContent);
+
+  function findPlace(query) {
+    var q = query.split(",")[0].trim().toLowerCase();
+    if (!q) return null;
+    var i;
+    for (i = 0; i < mnPlaces.length; i++) {
+      if (mnPlaces[i].name.toLowerCase() === q) return mnPlaces[i];
     }
-  });
-  var nearLakeSel = document.getElementById("f-near-lake");
-  Object.keys(lakeCoords)
-    .map(function (dow) { return { dow: dow, name: lakeCoords[dow].name }; })
-    .sort(function (a, b) { return a.name.localeCompare(b.name); })
-    .forEach(function (l) {
-      var o = document.createElement("option");
-      o.value = l.dow; o.textContent = l.name;
-      nearLakeSel.appendChild(o);
-    });
+    for (i = 0; i < mnPlaces.length; i++) {
+      if (mnPlaces[i].name.toLowerCase().indexOf(q) === 0) return mnPlaces[i];
+    }
+    for (i = 0; i < mnPlaces.length; i++) {
+      if (mnPlaces[i].name.toLowerCase().indexOf(q) !== -1) return mnPlaces[i];
+    }
+    return null;
+  }
 
   var EARTH_RADIUS_MI = 3958.8;
   function haversineMiles(lat1, lon1, lat2, lon2) {
@@ -689,7 +658,7 @@
   });
 
   var state = {
-    search: "", county: "", species: "", gameFishOnly: false, carpOnly: false,
+    search: "", county: "", species: "",
     sortKey: "catch", sortDir: "desc", page: 1,
     refPoint: null, refLabel: "", radiusMiles: 25
   };
@@ -701,8 +670,6 @@
       if (s && r.lake.toLowerCase().indexOf(s) === -1) return false;
       if (state.county && r.county !== state.county) return false;
       if (state.species && r.code !== state.species) return false;
-      if (state.gameFishOnly && !r.gameFish) return false;
-      if (state.carpOnly && r.code !== "CAP") return false;
       if (state.refPoint) {
         var d = getDistance(r);
         if (d === null || d > state.radiusMiles) return false;
@@ -823,31 +790,23 @@
   document.getElementById("f-species").addEventListener("change", function (e) {
     state.species = e.target.value; state.page = 1; render();
   });
-  document.getElementById("f-gamefish").addEventListener("change", function (e) {
-    state.gameFishOnly = e.target.checked;
-    document.getElementById("f-gamefish-label").classList.toggle("active", state.gameFishOnly);
-    state.page = 1; render();
-  });
-  document.getElementById("f-carp").addEventListener("change", function (e) {
-    state.carpOnly = e.target.checked;
-    document.getElementById("f-carp-label").classList.toggle("active", state.carpOnly);
-    if (state.carpOnly) { speciesSel.value = ""; state.species = ""; }
-    state.page = 1; render();
-  });
 
   // ---------- Distance controls ----------
+  var statusRow = document.getElementById("distance-status-row");
   var statusEl = document.getElementById("distance-status");
   var clearBtn = document.getElementById("f-clear-distance");
   var locateBtn = document.getElementById("f-locate");
   var radiusInput = document.getElementById("f-radius");
+  var cityInput = document.getElementById("f-city");
 
   function setDistanceStatus(text, kind) {
     statusEl.textContent = text;
     statusEl.className = "distance-status" + (kind ? " " + kind : "");
+    statusRow.hidden = !text;
     clearBtn.hidden = !state.refPoint;
   }
 
-  document.getElementById("f-locate").addEventListener("click", function () {
+  locateBtn.addEventListener("click", function () {
     if (!navigator.geolocation) {
       setDistanceStatus("Geolocation isn't available in this browser.", "error");
       return;
@@ -858,28 +817,40 @@
       function (pos) {
         state.refPoint = { lat: pos.coords.latitude, lon: pos.coords.longitude };
         state.refLabel = "your location";
-        nearLakeSel.value = "";
+        cityInput.value = "";
         locateBtn.disabled = false;
         setDistanceStatus("Centered on your location", "active");
         state.page = 1; render();
       },
       function (err) {
         locateBtn.disabled = false;
-        setDistanceStatus("Couldn't get your location (" + err.message + ")", "error");
+        setDistanceStatus(
+          "Couldn't get your location (" + err.message + ") — try typing a city instead.",
+          "error"
+        );
       },
       { timeout: 10000 }
     );
   });
 
-  nearLakeSel.addEventListener("change", function (e) {
-    var dow = e.target.value;
-    if (!dow) return;
-    var lake = lakeCoords[dow];
-    state.refPoint = { lat: lake.lat, lon: lake.lon };
-    state.refLabel = lake.name;
-    setDistanceStatus("Centered on " + lake.name, "active");
+  function geocodeCity() {
+    var q = cityInput.value.trim();
+    if (!q) return;
+    var place = findPlace(q);
+    if (!place) {
+      setDistanceStatus('No Minnesota city/town matching "' + q + '".', "error");
+      return;
+    }
+    state.refPoint = { lat: place.lat, lon: place.lon };
+    state.refLabel = place.name;
+    setDistanceStatus("Centered on " + place.name + ", MN", "active");
     state.page = 1; render();
+  }
+
+  cityInput.addEventListener("keydown", function (e) {
+    if (e.key === "Enter") geocodeCity();
   });
+  cityInput.addEventListener("blur", geocodeCity);
 
   radiusInput.addEventListener("input", function (e) {
     var v = parseFloat(e.target.value);
@@ -890,7 +861,7 @@
   clearBtn.addEventListener("click", function () {
     state.refPoint = null;
     state.refLabel = "";
-    nearLakeSel.value = "";
+    cityInput.value = "";
     setDistanceStatus("");
     state.page = 1; render();
   });
