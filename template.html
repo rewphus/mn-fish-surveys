@@ -490,6 +490,65 @@
 
   footer strong { color: var(--ink-secondary); }
 
+  /* Mobile card list - replaces the table below 680px instead of forcing
+     horizontal scroll through 8 columns */
+  .card-list { display: none; flex-direction: column; }
+
+  .fish-card {
+    padding: 14px 16px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .fish-card:last-child { border-bottom: none; }
+
+  .fish-card-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 10px;
+  }
+
+  .fish-card-lake { font-weight: 700; font-size: 15px; }
+  .fish-card-county { font-size: 12.5px; color: var(--ink-secondary); }
+  .fish-card-date { font-size: 11.5px; color: var(--ink-muted); white-space: nowrap; }
+
+  .fish-card-species { font-size: 14px; }
+
+  .fish-card-stats {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 8px;
+    background: var(--surface-alt);
+    border-radius: 7px;
+    padding: 8px 10px;
+  }
+
+  .fish-card-stat { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+
+  .fish-card-stat .stat-label {
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+    color: var(--ink-muted);
+  }
+
+  .fish-card-stat .stat-value {
+    font-size: 13px;
+    font-variant-numeric: tabular-nums;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  @media (max-width: 680px) {
+    .table-scroll { display: none; }
+    .card-list { display: flex; }
+    .fish-card-stats { grid-template-columns: repeat(2, 1fr); }
+  }
+
   @media (prefers-reduced-motion: reduce) {
     * { transition: none !important; }
   }
@@ -541,6 +600,7 @@
         <tbody id="table-body"></tbody>
       </table>
     </div>
+    <div class="card-list" id="card-list"></div>
     <div class="pagination" id="pagination"></div>
   </section>
 
@@ -753,7 +813,9 @@
     });
 
     var tbody = document.getElementById("table-body");
+    var cardList = document.getElementById("card-list");
     tbody.innerHTML = "";
+    cardList.innerHTML = "";
     if (!pageRows.length) {
       var tr = document.createElement("tr");
       var td = document.createElement("td");
@@ -762,10 +824,13 @@
       td.textContent = "No rows match those filters.";
       tr.appendChild(td);
       tbody.appendChild(tr);
+      cardList.innerHTML = '<div class="empty-state">No rows match those filters.</div>';
     } else {
       pageRows.forEach(function (r) {
-        var tr = document.createElement("tr");
         var dist = getDistance(r);
+        var distText = dist === null ? "—" : fmtNum(dist, 1) + " mi";
+
+        var tr = document.createElement("tr");
         tr.innerHTML =
           '<td class="lake-cell">' + r.lake + "</td>" +
           '<td class="county-cell">' + (r.county || "—") + "</td>" +
@@ -776,6 +841,23 @@
           '<td class="num">' + fmtSize(r) + "</td>" +
           '<td class="num">' + (dist === null ? "—" : fmtNum(dist, 1)) + "</td>";
         tbody.appendChild(tr);
+
+        var card = document.createElement("div");
+        card.className = "fish-card";
+        card.innerHTML =
+          '<div class="fish-card-head">' +
+            '<div><div class="fish-card-lake">' + r.lake + '</div>' +
+            '<div class="fish-card-county">' + (r.county || "—") + ' County</div></div>' +
+            '<div class="fish-card-date mono">' + r.date + "</div>" +
+          "</div>" +
+          '<div class="fish-card-species">' + r.name + (r.gameFish ? '<span class="game-badge">GAME</span>' : "") + "</div>" +
+          '<div class="fish-card-stats">' +
+            '<div class="fish-card-stat"><span class="stat-label">Catch</span><span class="stat-value mono">' + fmtNum(r.catch) + "</span></div>" +
+            '<div class="fish-card-stat"><span class="stat-label">Avg Wt</span><span class="stat-value mono">' + fmtNum(r.avgWeight, 2) + (r.avgWeight != null ? " lb" : "") + "</span></div>" +
+            '<div class="fish-card-stat"><span class="stat-label">Size</span><span class="stat-value mono">' + fmtSize(r) + "</span></div>" +
+            '<div class="fish-card-stat"><span class="stat-label">Distance</span><span class="stat-value mono">' + distText + "</span></div>" +
+          "</div>";
+        cardList.appendChild(card);
       });
     }
 
